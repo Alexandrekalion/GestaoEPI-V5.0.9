@@ -3,6 +3,7 @@ from auth import get_password_hash
 from datetime import datetime, timedelta, timezone
 import asyncio
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -12,10 +13,14 @@ async def seed_database():
     # Criar admin (substitui super_admin)
     existing_user = await db.users.find_one({"username": "administrador"})
     if not existing_user:
+        default_admin_password = os.environ.get("DEFAULT_ADMIN_PASSWORD")
+        if not default_admin_password:
+            logger.warning("DEFAULT_ADMIN_PASSWORD nao definido; usuario administrador inicial nao sera criado.")
+            return
         admin = {
             "username": "administrador",
-            "email": "admin@cipolatti.com",
-            "hashed_password": get_password_hash("LR1a2b3c4567@"),
+            "email": os.environ.get("DEFAULT_ADMIN_EMAIL", "admin@example.com"),
+            "hashed_password": get_password_hash(default_admin_password),
             "role": "admin",  # Novo perfil
             "is_primary_admin": True,  # ADMINISTRADOR PRINCIPAL
             "must_change_password": True,

@@ -11,19 +11,20 @@ from auth import get_password_hash
 from datetime import datetime, timedelta, timezone
 import asyncio
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
 # 5 Empresas
 EMPRESAS = [
     {
-        "legal_name": "Cipolatti Indústria Metalúrgica Ltda",
-        "trade_name": "Cipolatti Metalúrgica",
+        "legal_name": "Empresa Demonstracao Industrial Ltda",
+        "trade_name": "Empresa Demo Industrial",
         "cnpj": "12.345.678/0001-90",
         "address": "Av. Industrial, 1500 - São Paulo, SP",
         "contact_person": "Carlos Roberto",
         "contact_phone": "(11) 99999-1234",
-        "contact_email": "contato@cipolatti.com.br"
+        "contact_email": "contato@example.com"
     },
     {
         "legal_name": "Construtech Engenharia e Construções SA",
@@ -357,26 +358,26 @@ KITS = [
 USUARIOS_TESTE = [
     {
         "username": "gestor.teste",
-        "email": "gestor@cipolatti.com",
-        "password": "Gestor@2026!",
+        "email": "gestor@example.com",
+        "password_env": "TEST_GESTOR_PASSWORD",
         "role": "gestor"
     },
     {
         "username": "rh.teste",
-        "email": "rh@cipolatti.com",
-        "password": "RH@2026teste!",
+        "email": "rh@example.com",
+        "password_env": "TEST_RH_PASSWORD",
         "role": "rh"
     },
     {
         "username": "seguranca.teste",
-        "email": "seguranca@cipolatti.com",
-        "password": "Seguranca@2026!",
+        "email": "seguranca@example.com",
+        "password_env": "TEST_SEGURANCA_PASSWORD",
         "role": "seguranca_trabalho"
     },
     {
         "username": "almoxarifado.teste",
-        "email": "almoxarifado@cipolatti.com",
-        "password": "Almox@2026teste!",
+        "email": "almoxarifado@example.com",
+        "password_env": "TEST_ALMOXARIFADO_PASSWORD",
         "role": "almoxarifado"
     }
 ]
@@ -484,10 +485,14 @@ async def seed_complete():
     for user in USUARIOS_TESTE:
         existing = await db.users.find_one({"username": user["username"]})
         if not existing:
+            user_password = os.environ.get(user["password_env"])
+            if not user_password:
+                logger.warning(f"{user['password_env']} nao definido; usuario {user['username']} nao sera criado.")
+                continue
             user_data = {
                 "username": user["username"],
                 "email": user["email"],
-                "hashed_password": get_password_hash(user["password"]),
+                "hashed_password": get_password_hash(user_password),
                 "role": user["role"],
                 "must_change_password": False,  # Para testes, não exigir mudança
                 "is_active": True,
@@ -507,13 +512,9 @@ async def seed_complete():
     logger.info(f"Colaboradores: {len(COLABORADORES)}")
     logger.info(f"Usuários de teste: {len(USUARIOS_TESTE)}")
     logger.info("\n" + "="*50)
-    logger.info("CREDENCIAIS DE ACESSO:")
+    logger.info("USUARIOS DE TESTE:")
     logger.info("="*50)
-    logger.info("Admin: administrador / LR1a2b3c4567@")
-    logger.info("Gestor: gestor.teste / Gestor@2026!")
-    logger.info("RH: rh.teste / RH@2026teste!")
-    logger.info("Seg. Trabalho: seguranca.teste / Seguranca@2026!")
-    logger.info("Almoxarifado: almoxarifado.teste / Almox@2026teste!")
+    logger.info("Defina as senhas por variaveis de ambiente antes de criar usuarios de teste.")
     logger.info("="*50)
 
 if __name__ == '__main__':
