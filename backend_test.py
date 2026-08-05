@@ -7,7 +7,6 @@ Tests new features: NBR field, replacement periodicity, mandatory kits, alerts
 import requests
 import sys
 import json
-import os
 from datetime import datetime, timedelta
 from typing import Dict, Any, Optional
 
@@ -83,10 +82,7 @@ class GestaoEPITester:
         success, response = self.make_request(
             "POST", 
             "auth/login",
-            {
-                "username": os.environ.get("TEST_ADMIN_USERNAME", "administrador"),
-                "password": os.environ.get("TEST_ADMIN_PASSWORD", "")
-            }
+            {"username": "administrador", "password": "LR1a2b3c4567@"}
         )
         
         if success and 'access_token' in response:
