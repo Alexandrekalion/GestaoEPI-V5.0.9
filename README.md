@@ -80,6 +80,6 @@ Versao historica do GestaoEPI. Existem repositorios mais recentes relacionados, 
 
 ## Autor
 
-Desenvolvido por Michele Santana — Kalion Tecnologia
+Desenvolvido por Alexandre Santana dos Santos — Kalion Tecnologia
 
 Perfil profissional: https://github.com/Tr3mbolon4
